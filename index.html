@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Browser Compatible Dictaphone</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+ <link rel="stylesheet" href="dictaphone.css">
+</head>
+<body class="bg-light">
+    <div id="copyFeedback" class="copy-feedback">
+        <i class="fas fa-check-circle"></i> Text copied to clipboard!
+    </div>
+
+    <div class="container mt-3">
+        <!-- Browser Check Modal -->
+        <div class="modal fade" id="browserModal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">Browser Compatibility Notice</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your browser doesn't support speech recognition. For the best experience, please use one of these browsers:</p>
+                        <div class="list-group">
+                            <a href="https://www.google.com/chrome/" class="list-group-item list-group-item-action" target="_blank">
+                                <i class="fab fa-chrome"></i> Google Chrome
+                                <small class="float-end text-success">Recommended</small>
+                            </a>
+                            <a href="https://www.microsoft.com/edge" class="list-group-item list-group-item-action" target="_blank">
+                                <i class="fab fa-edge"></i> Microsoft Edge
+                            </a>
+                        </div>
+                        <div class="mt-3">
+                            <p class="mb-2">Alternative options:</p>
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action" id="continueAnyway">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i> Continue with limited features
+                                </a>
+                                <a href="https://support.mozilla.org/en-US/kb/firefox-reader-view-clutter-free-web-pages" class="list-group-item list-group-item-action" target="_blank">
+                                    <i class="fas fa-info-circle"></i> Use Firefox built-in reader (Read aloud)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <small class="text-muted">Speech recognition is currently only supported in Chrome and Edge browsers.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Content -->
+        <div id="mainContent" style="display: none;">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Dictaphone</h3>
+                    <div>
+                        <span class="badge bg-info" id="browserBadge"></span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3" id="compatWarning" style="display: none;">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            You're using a browser with limited speech recognition support. For the best experience, we recommend using 
+                            <a href="https://www.google.com/chrome/" target="_blank">Chrome</a> or 
+                            <a href="https://www.microsoft.com/edge" target="_blank">Edge</a>.
+                        </div>
+                    </div>
+
+                    <div id="firefoxHelp" style="display: none;">
+                        <div class="alert alert-info">
+                            <h5>Firefox Alternative Methods:</h5>
+                            <ol>
+                                <li>Use Firefox's built-in Reader View:
+                                    <ul>
+                                        <li>Click the reader view icon (📖) in the address bar</li>
+                                        <li>Use the "Listen" feature to have text read aloud</li>
+                                    </ul>
+                                </li>
+                                <li>Try Firefox extensions:
+                                    <ul>
+                                        <li><a href="https://addons.mozilla.org/en-US/firefox/addon/read-aloud/" target="_blank">Read Aloud Extension</a></li>
+                                        <li><a href="https://addons.mozilla.org/en-US/firefox/addon/speech-recognition/" target="_blank">Speech Recognition Extension</a></li>
+                                    </ul>
+                                </li>
+                                <li>Use system accessibility features:
+                                    <ul>
+                                        <li>Windows: Windows Speech Recognition</li>
+                                        <li>macOS: Dictation (Press Fn twice or go to System Preferences)</li>
+                                        <li>Linux: Various options like Simon or Julius</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div id="dictaphoneUI">
+                       <div class="mb-3">
+							<label class="form-label">Select Language:</label>
+							<select id="languageSelect" class="form-select mb-3">
+								<option value="en-US">English (US)</option>
+								<option value="en-GB">English (UK)</option>
+								<option value="fr-FR">Français</option>
+								<option value="es-ES">Español</option>
+							</select>
+						</div>
+
+						<div class="button-container mb-3">
+							<div class="d-flex align-items-center">
+								<button id="startBtn" class="btn btn-primary me-2">
+									<i class="fas fa-microphone"></i> Start Recording
+								</button>
+								<button id="stopBtn" class="btn btn-danger me-2" style="display: none;">
+									<i class="fas fa-stop"></i> Stop
+								</button>
+								<button id="testBtn" class="btn btn-info btn-sm">
+									<i class="fas fa-check-circle"></i> Test Mic
+								</button>
+								<span id="recordingIndicator" style="display: none; margin-left: 10px;">
+									<span class="recording-indicator"></span>
+									<span class="recording-text">Recording</span>
+								</span>
+							</div>
+						</div>
+
+						<div id="status" class="alert alert-info">
+							Please test your microphone first
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label">Microphone Level:</label>
+							<div class="progress" style="height: 20px;">
+								<div id="volumeMeter" class="progress-bar" role="progressbar" style="width: 0%"></div>
+							</div>
+						</div>
+
+						<div class="mb-3">
+							<div class="d-flex justify-content-between align-items-center mb-2">
+								<label class="form-label mb-0">Transcribed Text:</label>
+								<button id="clearBtn" class="btn btn-secondary btn-sm">
+									<i class="fas fa-trash"></i> Clear Text
+								</button>
+							</div>
+							<div class="textarea-container">
+								<textarea id="output" class="form-control" rows="6" readonly></textarea>
+								<button id="copyButton" class="btn btn-sm btn-secondary copy-button" title="Copy to clipboard">
+									<i class="fas fa-copy"></i>
+								</button>
+							</div>
+						</div>
+
+                        <div id="debugInfo" class="border p-2 mt-3 bg-light"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script src="dictaphone.js"></script>
+
+</body>
+</html>
